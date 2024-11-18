@@ -14,6 +14,5 @@ services:
         privileged: true
         volumes:
             - ~/.aws/:/home/${USER_NAME}/.aws/
-            - ./.ash_history:/home/${USER_NAME}/.ash_history
             - ../:/home/${USER_NAME}/src/${REPO}
         working_dir: /home/${USER_NAME}/src/${REPO}

@@ -44,8 +44,7 @@ RUN addgroup --gid ${USER_GID} ${USER_GROUP} \
  && adduser --disabled-password \
     --ingroup ${USER_GROUP} \
     --uid ${USER_UID} \
-    ${USER_NAME} \
- && echo "" >> /home/${USER_NAME}/.ash_history
+    ${USER_NAME}
 
 # Add the user to the docker and sudo groups.
 RUN usermod -aG sudo ${USER_NAME} \
