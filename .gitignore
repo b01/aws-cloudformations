@@ -1,0 +1,9 @@
+# Directories
+# -----------
+/.idea/
+
+# Files
+# -----
+/.docker/.ash_history
+/64-out.txt
+/*-test\.*

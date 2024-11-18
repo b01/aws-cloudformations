@@ -1,0 +1,56 @@
+# aws cloudformation validate-template --template-body file://ec2-instance.yml
+# aws cloudformation create-stack --stack-name Ec2StackTest --template-body file://ec2-instance.yml --parameters file://ec2-instance-test.json --capabilities CAPABILITY_NAMED_IAM
+# aws cloudformation create-change-set --change-set-type UPDATE --stack-name Ec2StackTest --template-body file://ec2-instance.yml --change-set-name UpdateV1 --capabilities CAPABILITY_NAMED_IAM
+# aws cloudformation delete-stack --stack-name Ec2StackTest
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-reference.html
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  AmiId:
+    Description: ID of an existing AMI in the region.
+    Type: 'AWS::EC2::Image::Id'
+  AssociatePublicIp:
+    Default: "false"
+    Description: Set to "true" to associate a Public IP with the instance. Default is "false".
+    Type: String
+  InstanceType:
+    Type: String
+    Default: 't2.micro'
+  SubnetId:
+    Type: 'AWS::EC2::Subnet::Id'
+  SecurityGroupId:
+    Type: 'AWS::EC2::SecurityGroup::Id'
+  UserData:
+    Type: String
+    Default: ""
+
+Resources:
+  Ec2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: !Ref AmiId
+      InstanceType: !Ref InstanceType
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: !Ref AssociatePublicIp
+          DeviceIndex: 0
+          GroupSet:
+            - !Ref SecurityGroupId
+          SubnetId: !Ref SubnetId
+      Tags:
+        - Key: Name
+          Value: !Join
+            - ''
+            - - !Ref AWS::StackName
+              - 'EC2'
+        - Key: Description
+          Value: !Join
+            - ''
+            - - !Ref AWS::StackName
+              - 'EC2'
+      UserData: !Ref UserData
+
+Outputs:
+  InstanceId:
+    Description: EC2 instance ID
+    Value: !Ref Ec2Instance

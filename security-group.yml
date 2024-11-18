@@ -1,0 +1,53 @@
+# aws cloudformation validate-template --template-body file://security-group.yml
+# aws cloudformation create-stack --stack-name SGStackTest --template-body file://security-group.yml --parameters file://security-group-test.json --capabilities CAPABILITY_NAMED_IAM
+# aws cloudformation create-change-set --change-set-type UPDATE --stack-name SGStackTest --template-body file://security-group.yml --change-set-name UpdateV1 --capabilities CAPABILITY_NAMED_IAM
+# aws cloudformation delete-stack --stack-name SGStackTest
+# https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/template-reference.html
+
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Name:
+    Type: String
+  Prefix:
+    Type: String
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+    Description: ID of an existing Virtual Private Cloud (VPC).
+
+Resources:
+  WebServerSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: !Join
+        - ' '
+        - - !Ref Prefix
+          - !Ref Name
+          - 'security group'
+      GroupName: !Ref Name
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          FromPort: -1
+          ToPort: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+      Tags:
+        - Key: Name
+          Value: !Join
+            - '-'
+            - - !Ref Prefix
+              - !Ref Name
+      VpcId: !Ref VpcId
+
+Outputs:
+  WebServerSgId:
+    Description: Web Server security group ID
+    Value: !Ref WebServerSG
